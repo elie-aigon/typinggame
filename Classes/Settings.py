@@ -19,3 +19,5 @@ font_title = pygame.font.Font("Data/Font/upheavtt.ttf", 75)
 with open('Data/JSON/mot.json', 'r') as f:
     word_list = json.load(f)
 random.shuffle(word_list)
+with open('Data/JSON/scores.json', 'r') as f:
+    scores_dic = json.load(f)

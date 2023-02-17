@@ -2,20 +2,33 @@ from Settings import *
 from FELLOW import FELLOW
 from BLOCK import BLOCK
 from HEART import HEART
+from BUTTON import BUTTON
+from SCORBOARD import SCOREBOARD
 
 class GAME():
     def __init__(self, surface):
         self.surface = surface
+        # buttons
+        self.menu_button = BUTTON(self.surface, font_small, grey, 1200, 800, 150, 80, "MENU", "Data/Images/green_button/gree_normal.png", lambda: self.button_menu_action())
+        self.quit_button = BUTTON(self.surface, font_small, grey, 1400, 800, 150, 80, "QUIT", "Data/Images/red/red_normal.png", lambda: self.button_quit_action())
+        # scorboard
+        self.scorboard = SCOREBOARD(self.surface, (1150, 70))
+        # title
+        self.title = font_title.render("TYPING GAME", True, grey)
+        # state
+        self.game_active = True
+        self.blocks_moving = False
+        self.count = 0
         # lives
         self.lives = 3
         self.heart_group = pygame.sprite.Group()
         self.heart_group.add(HEART(), HEART(), HEART())
         self.heart_group.sprites()[1].rect.x += 65
         self.heart_group.sprites()[2].rect.x += 130
-        # for element in self.heart_group:
+        # for element in self.heart_group
         #     element.rect.x += self.heart_group.index(element) * 65
         # def fellow
-        self.fellow = FELLOW()
+        self.fellow = FELLOW()  
         self.fellow_group = pygame.sprite.Group()
         self.fellow_group.add(self.fellow)
         # def block
@@ -28,6 +41,12 @@ class GAME():
         # word typed
         self.input_char = []
 
+    def button_menu_action(self):
+        self.game_active = False
+
+    def button_quit_action(self):
+        pygame.quit()
+        sys.exit()
     def get_pos_rand_word(self):
         for block in self.block_group:
             first_block = self.block_group.sprites()[0]
@@ -42,13 +61,30 @@ class GAME():
 
     def draw_elements(self):
         self.surface.blit(self.background, (0, 0))
-        self.fellow_group.draw(self.surface)
-        self.block_group.draw(self.surface)
-        self.heart_group.draw(self.surface)
-        for block in self.block_group:
-            block.draw_text_block(self.surface)
-            self.draw_word_typed()
+        self.quit_button.draw_button()
+        if not self.game_active:
+            self.surface.blit(self.title, (window_size[0] //2 - self.title.get_width()// 2, 30))
+            self.scorboard.draw_scoreboard()
+        if self.game_active:
+            self.menu_button.draw_button()
+            self.fellow_group.draw(self.surface)
+            self.block_group.draw(self.surface)
+            self.heart_group.draw(self.surface)
+            for block in self.block_group:
+                block.draw_text_block(self.surface)
+                self.draw_word_typed()
 
+    # word organisation
+    def sys_word_moving(self):
+        self.count += 1
+        self.blocks_moves()
+        if self.count == 14:
+            self.input_char = []
+            self.add_block()
+            self.del_first_block()
+            self.count = 0
+            self.blocks_moving = False
+    
     def add_block(self):
         self.new_block = BLOCK()
         self.block_group.add(self.new_block)
@@ -59,17 +95,19 @@ class GAME():
             self.block_group.remove(self.first_block)
             self.lives -= 1
 
-    def del_last_block(self):
-        self.last_block = self.heart_group.sprites()[-1]
-        self.heart_group.remove(self.last_block)
     def blocks_moves(self):
         for block in self.block_group:
             block.rect.y += self.block.speed
 
+    # check input 
     def is_valid_letter(self, char):
-        
         self.new_char_index = len(self.input_char)
         if self.split_word_input[self.new_char_index] == char:
             return True
         else:
             return False
+
+    # del lives if wrong
+    def del_last_block(self):
+        self.last_block = self.heart_group.sprites()[-1]
+        self.heart_group.remove(self.last_block)
