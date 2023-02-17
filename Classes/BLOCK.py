@@ -8,7 +8,11 @@ class BLOCK(animation.ANIMATE):
         self.rect.x = random.randint(200,600)
         self.rect.y = -200
         self.speed = 20
-        self.random_word = random.choice(word_list)
+        self.lang_fr = True
+        if self.lang_fr:
+            self.random_word = random.choice(word_list["francais"])
+        else:
+            self.random_word = random.choice(word_list["anglais"])
         self.split_word = [char for char in self.random_word]
 
     def draw_text_block(self, surface):

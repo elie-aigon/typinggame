@@ -19,18 +19,31 @@ while True:
             game.quit_button.is_clicked(pygame.mouse.get_pos())
             if game.game_active:
                 game.menu_button.is_clicked(pygame.mouse.get_pos())
+            elif not game.game_active:
+                game.checked_box_easy.is_clicked(pygame.mouse.get_pos())
+                game.checked_box_normal.is_clicked(pygame.mouse.get_pos())
+                game.checked_box_hard.is_clicked(pygame.mouse.get_pos())
+                game.checkbox_en.is_clicked(pygame.mouse.get_pos())
+                game.checkbox_fr.is_clicked(pygame.mouse.get_pos())
         if event.type == pygame.KEYDOWN:
         
             if event.key == pygame.K_RETURN:
                 game.blocks_moving = True
-            if event.key == pygame.K_BACKSPACE:
-                game.input_char = game.input_char[-1]
-            if event.key in range(96, 123):
-                if game.is_valid_letter(chr(event.key)):
-                    game.input_char.append(chr(event.key))
-                    if game.input_char == game.split_word:
-                        game.blocks_moving = True
-                else:
-                    game.del_last_block()
+            if game.game_active:
+                if event.key in range(96, 123):
+                    if game.is_valid_letter(chr(event.key)):
+                        game.input_char.append(chr(event.key))
+                        if game.input_char == game.split_word:
+                            game.blocks_moving = True
+                    else:
+                        game.del_last_block()
+            if not game.game_active:
+                if event.key == pygame.K_BACKSPACE:
+                    game.name = game.name[:-1]
+                if event.key in range(96, 123):
+                    game.name.append(chr(event.key))
+                if event.key == pygame.K_RETURN:
+                    game.game_active = True
+                print(game.name)
     game.draw_elements()
     pygame.display.update()
