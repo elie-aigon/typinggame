@@ -3,6 +3,7 @@ from operator import itemgetter
 from pygame.math import Vector2
 
 pygame.init()
+pygame.mixer.init()
 
 window_size = (1600, 900)
 # Color

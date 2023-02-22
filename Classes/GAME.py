@@ -10,7 +10,8 @@ from CHECKBOX_LANG import CHECKBOX_LANG
 class GAME():
     def __init__(self, surface):
         self.surface = surface
-        # buttons
+        # list spe char
+        self.spe_char = [233, 138, 133, 32]
         self.menu_button = BUTTON(self.surface, font_small, grey, 1200, 800, 150, 80, "MENU", "Data/Images/green_button/gree_normal.png", lambda: self.button_menu_action())
         self.quit_button = BUTTON(self.surface, font_small, grey, 1400, 800, 150, 80, "QUIT", "Data/Images/red/red_normal.png", lambda: self.button_quit_action())
         # scorboard
@@ -27,16 +28,15 @@ class GAME():
         self.heart_group.add(HEART(), HEART(), HEART())
         self.heart_group.sprites()[1].rect.x += 65
         self.heart_group.sprites()[2].rect.x += 130
-        # for element in self.heart_group
-        #     element.rect.x += self.heart_group.index(element) * 65
+
         # def fellow
         self.fellow = FELLOW()  
         self.fellow_group = pygame.sprite.Group()
         self.fellow_group.add(self.fellow)
         # def block
-        self.block = BLOCK()
-        self.block_group = pygame.sprite.Group()
-        self.block_group.add(self.block)
+        self.block_group = pygame.sprite.Group(BLOCK("fr"), BLOCK("fr"), BLOCK("fr"))
+        self.block_group.sprites()[0].rect.y += 560
+        self.block_group.sprites()[1].rect.y += 280
         # background
         self.background = pygame.image.load("Data/Images/background.png")
         self.background = pygame.transform.scale(self.background, window_size)  
@@ -48,8 +48,8 @@ class GAME():
         self.checked_box_hard = CHECKBOX(self.surface, font_mid, grey, 80, 640, 100, 90, "hard", "Data/images/unchecked_box.png", lambda: self.hard_clicked())
         self.checked_box_easy.state = True
         # checkbox lang
-        self.checkbox_fr = CHECKBOX_LANG(self.surface, font_mid, grey, 50, 30, 80, 80, "FR", "Data/Images/yellow/yellow_normal.png", lambda: self.fr_clicked())
-        self.checkbox_en = CHECKBOX_LANG(self.surface, font_mid, grey, 150, 30, 80, 80, "EN", "Data/Images/yellow/yellow_normal.png", lambda: self.en_clicked())
+        self.checkbox_fr = CHECKBOX_LANG(self.surface, font_mid, grey, 50, 30, 80, 80, "FR", "Data/Images/yellow/yellow_normal.png", lambda: self.lang_clicked("fr"))
+        self.checkbox_en = CHECKBOX_LANG(self.surface, font_mid, grey, 150, 30, 80, 80, "EN", "Data/Images/yellow/yellow_normal.png", lambda: self.lang_clicked("en"))
         self.checkbox_fr.state = True
         # name init
         self.name = []
@@ -70,12 +70,20 @@ class GAME():
         self.checked_box_normal.state = False
         self.checked_box_hard.state = True
     # checkbox lang org
-    def fr_clicked(self):
-        self.checkbox_fr.state = True
-        self.checkbox_en.state = False
-    def en_clicked(self):
-        self.checkbox_fr.state = False
-        self.checkbox_en.state = True
+    def lang_clicked(self, lang):
+        if self.checkbox_en.state:
+            self.checkbox_en.state = False
+            self.checkbox_fr.state = True
+        else:
+            self.checkbox_en.state = True
+            self.checkbox_fr.state = False
+
+        for block in self.block_group:
+            self.block_group.remove(block)
+        self.block_group = pygame.sprite.Group(BLOCK(lang), BLOCK(lang), BLOCK(lang))
+        self.block_group.sprites()[0].rect.y += 560
+        self.block_group.sprites()[1].rect.y += 280
+    
     # basics button org
     def button_menu_action(self):
         self.game_active = False
@@ -84,7 +92,6 @@ class GAME():
     def button_quit_action(self):
         pygame.quit()
         sys.exit()
-    
     # word render   
     def get_pos_rand_word(self):
         for block in self.block_group:
@@ -105,7 +112,7 @@ class GAME():
             self.instructions = font_mid.render("Type your name : ", True, white)
             self.name_aff = font_mid.render("".join(self.name), True, white)
             self.surface.blit(self.name_aff, (380, 120))
-            self.start_instruc = font_small.render("Click the difficulty, the lang then Press 'ENTER' to start playing : ", True, white)
+            self.start_instruc = font_small.render(" éàè Click the difficulty, the lang then Press 'ENTER' to start playing : ", True, white)
             self.surface.blit(self.start_instruc, (30, 210))
             self.surface.blit(self.title, (window_size[0] //2 - self.title.get_width()// 2, 30))
             self.checked_box_easy.draw_button()
@@ -120,11 +127,13 @@ class GAME():
             self.block_group.draw(self.surface)
             self.heart_group.draw(self.surface)
             for block in self.block_group:
+                print(block.rect.y)
                 block.draw_text_block(self.surface)
                 self.draw_word_typed()
 
     # word organisation
     def sys_word_moving(self):
+        self.play_sound("block_destroyed")
         self.count += 1
         self.blocks_moves()
         if self.count == 14:
@@ -135,7 +144,10 @@ class GAME():
             self.blocks_moving = False
     
     def add_block(self):
-        self.new_block = BLOCK()
+        if self.checkbox_en.state:
+            self.new_block = BLOCK("en")
+        else: 
+            self.new_block = BLOCK("fr")
         self.block_group.add(self.new_block)
     
     def del_first_block(self):
@@ -143,10 +155,14 @@ class GAME():
             self.first_block = self.block_group.sprites()[0]
             self.block_group.remove(self.first_block)
             self.lives -= 1
+    # sounds func
+    def play_sound(self, name):
+        pygame.mixer.music.load("Data/Sounds/"+ name + ".mp3")
+        pygame.mixer.music.play()
 
     def blocks_moves(self):
         for block in self.block_group:
-            block.rect.y += self.block.speed
+            block.rect.y += block.speed
 
     # check input 
     def is_valid_letter(self, char):
@@ -160,3 +176,4 @@ class GAME():
     def del_last_block(self):
         self.last_block = self.heart_group.sprites()[-1]
         self.heart_group.remove(self.last_block)
+        self.play_sound("error")

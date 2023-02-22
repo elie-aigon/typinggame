@@ -26,9 +26,6 @@ while True:
                 game.checkbox_en.is_clicked(pygame.mouse.get_pos())
                 game.checkbox_fr.is_clicked(pygame.mouse.get_pos())
         if event.type == pygame.KEYDOWN:
-        
-            if event.key == pygame.K_RETURN:
-                game.blocks_moving = True
             if game.game_active:
                 if event.key in range(96, 123):
                     if game.is_valid_letter(chr(event.key)):
@@ -44,6 +41,6 @@ while True:
                     game.name.append(chr(event.key))
                 if event.key == pygame.K_RETURN:
                     game.game_active = True
-                print(game.name)
+
     game.draw_elements()
     pygame.display.update()
