@@ -42,7 +42,7 @@ class SCOREBOARD():
 
     def update_score(self, name, score):
         if name in scores_dic:
-            if score < scores_dic[name]:
+            if score > scores_dic[name]:
                 scores_dic[name] = score
         else:
             scores_dic[name] = score

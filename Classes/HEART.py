@@ -5,5 +5,5 @@ class HEART(animation.ANIMATE):
         super().__init__("red_heart")
         self.image = pygame.transform.scale(self.image, (60, 50))
         self.rect = self.image.get_rect()
-        self.rect.x = 20
+        self.rect.x = 10
         self.rect.y = 30
