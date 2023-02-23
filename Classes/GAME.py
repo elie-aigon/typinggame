@@ -6,6 +6,7 @@ from BUTTON import BUTTON
 from SCORBOARD import SCOREBOARD
 from CHECKBOX import CHECKBOX
 from CHECKBOX_LANG import CHECKBOX_LANG
+from TIMER import TIMER
 
 class GAME():
     def __init__(self, surface):
@@ -25,6 +26,8 @@ class GAME():
         self.count = 0
         # lose state
         self.win = BUTTON(self.surface, font_big, white, 500, 300, 400, 300, "GAME OVER", "Data/Images/win_mess.png", lambda: self.button_menu_action())
+        # timer
+        self.timer = TIMER()
         # score
         self.score = 0
         # lives
@@ -69,16 +72,17 @@ class GAME():
         self.checked_box_easy.state = True
         self.checked_box_normal.state = False
         self.checked_box_hard.state = False
-    
+        self.timer.speed = 0.2
     def normal_clicked(self):
         self.checked_box_easy.state = False
         self.checked_box_normal.state = True
         self.checked_box_hard.state = False
-    
+        self.timer.speed = 0.4
     def hard_clicked(self):
         self.checked_box_easy.state = False
         self.checked_box_normal.state = False
         self.checked_box_hard.state = True
+        self.timer.speed = 0.6
     # checkbox lang org
     def lang_clicked(self, lang):
         if self.checkbox_en.state:
@@ -142,13 +146,15 @@ class GAME():
             for block in self.block_group:
                 block.draw_text_block(self.surface)
                 self.draw_word_typed()
+            self.timer.update_timer(self.surface)
+            self.score_aff = font_mid.render("score: "+ str(self.score), True, white)
+            self.surface.blit(self.score_aff, (window_size[0] - self.score_aff.get_width(), 30))
         if self.lose:
             self.win.draw_button()
             self.lose_instruc = font_small.render("Click me to restart", True, grey)
             self.surface.blit(self.lose_instruc, (570, 330))
     # score
     def update_score(self):
-        print("a")
         if self.checked_box_easy.state:
             self.score += 1
         if self.checked_box_normal.state:

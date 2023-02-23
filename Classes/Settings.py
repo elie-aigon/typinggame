@@ -9,6 +9,7 @@ window_size = (1600, 900)
 # Color
 grey = (34,45,46)
 white = (255, 255, 255)
+red = (255, 0, 0)
 
 # Font
 font_big = pygame.font.Font("Data/Font/upheavtt.ttf", 50)
